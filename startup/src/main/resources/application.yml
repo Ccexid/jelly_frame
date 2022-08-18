@@ -1,0 +1,17 @@
+spring:
+    application:
+        name: jelly-mini
+    mvc:
+        throw-exception-if-no-handler-found: true
+    web:
+      resources:
+          add-mappings: false
+#minio:
+#    endpoint: http://42.194.251.131:9000
+#    secure: false
+#    access-key: admin
+#    secret-key: jelly@2022
+#    bucket-name: jelly-bucket
+#netty:
+#    enable: false
+#    port: 8079
