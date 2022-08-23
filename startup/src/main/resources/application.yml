@@ -4,14 +4,30 @@ spring:
     mvc:
         throw-exception-if-no-handler-found: true
     web:
-      resources:
-          add-mappings: false
-#minio:
-#    endpoint: http://42.194.251.131:9000
-#    secure: false
-#    access-key: admin
-#    secret-key: jelly@2022
-#    bucket-name: jelly-bucket
+        resources:
+            add-mappings: false
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        password: 123456789
+        url: jdbc:mysql://42.194.251.131:3306/jelly?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC
+        hikari:
+            minimum-idle: 10
+            maximum-pool-size: 20
+            max-lifetime: 120000
+            connection-timeout: 30000
+            idle-timeout: 30000
+mybatis:
+    type-aliases-package: org.jelly.frame
+    mapper-locations: classpath*:mapper/*.xml
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+minio:
+    endpoint: http://42.194.251.131:9000
+    secure: false
+    access-key: admin
+    secret-key: jelly@2022
+    bucket-name: jelly-bucket
 #netty:
 #    enable: false
 #    port: 8079
