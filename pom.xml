@@ -10,6 +10,7 @@
     <modules>
         <module>startup</module>
         <module>common</module>
+        <module>minio</module>
     </modules>
     <packaging>pom</packaging>
     <name>jelly-frame</name>
@@ -62,6 +63,7 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+                <scope>provided</scope>
             </dependency>
             <!--commons-lang3-->
             <dependency>
@@ -133,6 +135,11 @@
             <dependency>
                 <groupId>org.jelly</groupId>
                 <artifactId>common</artifactId>
+                <version>${jelly.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jelly</groupId>
+                <artifactId>minio</artifactId>
                 <version>${jelly.version}</version>
             </dependency>
         </dependencies>

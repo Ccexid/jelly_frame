@@ -18,6 +18,10 @@
             <artifactId>common</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.jelly</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
