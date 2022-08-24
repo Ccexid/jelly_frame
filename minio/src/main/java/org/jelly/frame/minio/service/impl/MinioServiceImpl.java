@@ -4,6 +4,7 @@ import io.minio.*;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.jelly.frame.core.autoconfigure.MinioAutoConfiguration;
 import org.jelly.frame.minio.service.IMinioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -79,7 +85,7 @@ public class MinioServiceImpl implements IMinioService {
     }
 
     @Override
-    public void upload(MultipartFile file) throws Exception{
+    public void upload(MultipartFile file) throws Exception {
         try {
             if (file.isEmpty()) {
                 throw new FileNotFoundException("获取文件为空，请检查文件路径或文件文件完整性!");
@@ -94,15 +100,62 @@ public class MinioServiceImpl implements IMinioService {
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .build());
 
-            Assert.notNull(response,"文件上传失败");
+            Assert.notNull(response, "文件上传失败");
 
             //TODO 数据记录需要保存到 库中
 
-        } catch (IllegalAccessException | SecurityException |InvalidBucketNameException| IllegalArgumentException| NoSuchAlgorithmException|
-                InsufficientDataException| IOException| InvalidKeyException| ServerException|
-                XmlParserException| ErrorResponseException| InternalException| InvalidResponseException e) {
+        } catch (IllegalAccessException | SecurityException | InvalidBucketNameException | IllegalArgumentException | NoSuchAlgorithmException |
+                InsufficientDataException | IOException | InvalidKeyException | ServerException |
+                XmlParserException | ErrorResponseException | InternalException | InvalidResponseException e) {
             log.error("-IMinioService- [upload](83) RuntimeException ", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void download(String fileName, HttpServletResponse response) throws Exception {
+        InputStream inputStream = null;
+        ByteArrayOutputStream outputStream = null;
+        ServletOutputStream os = null;
+        try {
+            if (StringUtils.isEmpty(fileName)) {
+                throw new IllegalArgumentException("获取文件为空，请检查文件名正确性!");
+            }
+            MinioClient client = buildClient(minioAutoConfiguration.getBucketName());
+            //执行前先查询是否存在 文件
+            ObjectStat stat = client.statObject(StatObjectArgs.builder()
+                    .bucket(minioAutoConfiguration.getBucketName())
+                    .object(fileName).build());
+            Assert.notNull(stat, "获取文件失败");
+
+            inputStream = client.getObject(GetObjectArgs.builder()
+                    .bucket(stat.bucketName())
+                    .object(stat.name()).build());
+
+            outputStream = new ByteArrayOutputStream();
+            IOUtils.copy(inputStream, outputStream);
+            byte[] bytes = outputStream.toByteArray();
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            response.setContentType("application/octet-stream");
+            os = response.getOutputStream();
+            os.write(bytes);
+            os.flush();
+
+        } catch (IllegalAccessException | SecurityException | InvalidBucketNameException | IllegalArgumentException | NoSuchAlgorithmException |
+                InsufficientDataException | IOException | InvalidKeyException | ServerException |
+                XmlParserException | ErrorResponseException | InternalException | InvalidResponseException e) {
+            log.error("-IMinioService- [download](10) RuntimeException ", e);
+            throw new RuntimeException(e);
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (outputStream != null) {
+                outputStream.close();
+            }
+            if (os != null) {
+                os.close();
+            }
         }
     }
 }
