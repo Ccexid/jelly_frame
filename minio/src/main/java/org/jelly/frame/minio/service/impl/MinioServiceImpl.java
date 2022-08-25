@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.jelly.frame.core.autoconfigure.MinioAutoConfiguration;
+import org.jelly.frame.core.handler.JellyCheckedException;
+import org.jelly.frame.core.handler.JellyRuntimeException;
 import org.jelly.frame.minio.service.IMinioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -60,7 +61,7 @@ public class MinioServiceImpl implements IMinioService {
         MinioClient minioClient;
         try {
             if (StringUtils.isEmpty(bucketName)) {
-                throw new IllegalAccessException("bucketName must be fill in");
+                throw new JellyCheckedException("bucketName must be fill in");
             }
             minioClient = MinioClient.builder()
                     .endpoint(minioAutoConfiguration.getProperties().getEndpoint())
@@ -77,8 +78,8 @@ public class MinioServiceImpl implements IMinioService {
         } catch (ErrorResponseException | IllegalArgumentException | InsufficientDataException |
                 InternalException | InvalidBucketNameException | InvalidKeyException |
                 InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
-                XmlParserException | IllegalAccessException | SecurityException e) {
-            throw new RuntimeException(e);
+                XmlParserException | JellyCheckedException | SecurityException e) {
+            throw new JellyRuntimeException(e);
         }
 
         return minioClient;
@@ -88,7 +89,7 @@ public class MinioServiceImpl implements IMinioService {
     public void upload(MultipartFile file) throws Exception {
         try {
             if (file.isEmpty()) {
-                throw new FileNotFoundException("获取文件为空，请检查文件路径或文件文件完整性!");
+                throw new JellyCheckedException("获取文件为空，请检查文件路径或文件文件完整性!");
             }
             MinioClient client = buildClient(minioAutoConfiguration.getBucketName());
 
@@ -108,7 +109,7 @@ public class MinioServiceImpl implements IMinioService {
                 InsufficientDataException | IOException | InvalidKeyException | ServerException |
                 XmlParserException | ErrorResponseException | InternalException | InvalidResponseException e) {
             log.error("-IMinioService- [upload](83) RuntimeException ", e);
-            throw new RuntimeException(e);
+            throw new JellyRuntimeException(e);
         }
     }
 
@@ -119,7 +120,7 @@ public class MinioServiceImpl implements IMinioService {
         ServletOutputStream os = null;
         try {
             if (StringUtils.isEmpty(fileName)) {
-                throw new IllegalArgumentException("获取文件为空，请检查文件名正确性!");
+                throw new JellyCheckedException("获取文件为空，请检查文件名正确性!");
             }
             MinioClient client = buildClient(minioAutoConfiguration.getBucketName());
             //执行前先查询是否存在 文件
@@ -145,7 +146,7 @@ public class MinioServiceImpl implements IMinioService {
                 InsufficientDataException | IOException | InvalidKeyException | ServerException |
                 XmlParserException | ErrorResponseException | InternalException | InvalidResponseException e) {
             log.error("-IMinioService- [download](10) RuntimeException ", e);
-            throw new RuntimeException(e);
+            throw new JellyRuntimeException(e);
         } finally {
             if (inputStream != null) {
                 inputStream.close();

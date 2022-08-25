@@ -21,12 +21,8 @@ public class MinioController {
     }
 
     @PostMapping(value = "/upload", produces = "application/json;charset=utf-8")
-    public ResultsHelper<Object> upload(@RequestParam(value = "file") MultipartFile file) {
-        try {
-            iMinioService.upload(file);
-            return ResultsHelper.builder().success("文件上传成功").build();
-        } catch (Exception e) {
-            return ResultsHelper.builder().fail("文件上传失败").build();
-        }
+    public ResultsHelper<Object> upload(@RequestParam(value = "file") MultipartFile file) throws Exception {
+        iMinioService.upload(file);
+        return ResultsHelper.builder().success("文件上传成功").build();
     }
 }
