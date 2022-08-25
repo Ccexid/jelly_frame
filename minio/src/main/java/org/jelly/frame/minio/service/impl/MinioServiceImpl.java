@@ -1,5 +1,7 @@
 package org.jelly.frame.minio.service.impl;
 
+import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.crypto.SecureUtil;
 import io.minio.*;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
@@ -93,11 +95,17 @@ public class MinioServiceImpl implements IMinioService {
             }
             MinioClient client = buildClient(minioAutoConfiguration.getBucketName());
 
+            // 对文件重新编码加密
+            //重新命名文件
+            String fileName = FileNameUtil.mainName(file.getOriginalFilename());
+            String fileExt = FileNameUtil.extName(file.getOriginalFilename());
+            String name = SecureUtil.md5(fileName) + "." + fileExt;
+
             ObjectWriteResponse response = client.putObject(PutObjectArgs
                     .builder()
                     .bucket(minioAutoConfiguration.getBucketName())
                     .contentType(file.getContentType())
-                    .object(file.getOriginalFilename())
+                    .object(name)
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .build());
 
