@@ -17,6 +17,10 @@ spring:
             max-lifetime: 120000
             connection-timeout: 30000
             idle-timeout: 30000
+    servlet:
+      multipart:
+          max-request-size: 1024MB
+          max-file-size: 1024MB
 mybatis:
     type-aliases-package: org.jelly.frame
     mapper-locations: classpath*:mapper/*.xml
