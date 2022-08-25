@@ -32,6 +32,7 @@
         <pagehelper.version>5.3.1</pagehelper.version>
         <lombok.version>1.18.24</lombok.version>
         <commons-io.version>2.7</commons-io.version>
+        <knife4j.version>2.0.9</knife4j.version>
         <skipTests>true</skipTests>
     </properties>
 
@@ -141,6 +142,14 @@
                 <groupId>org.jelly</groupId>
                 <artifactId>minio</artifactId>
                 <version>${jelly.version}</version>
+            </dependency>
+            <!--引入Knife4j的官方start包,Swagger2基于Springfox2.10.5项目-->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-dependencies</artifactId>
+                <version>${knife4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

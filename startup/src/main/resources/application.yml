@@ -3,9 +3,11 @@ spring:
         name: jelly-mini
     mvc:
         throw-exception-if-no-handler-found: true
+        pathmatch:
+            matching-strategy: ant_path_matcher
     web:
         resources:
-            add-mappings: false
+            add-mappings: true
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
         username: root
