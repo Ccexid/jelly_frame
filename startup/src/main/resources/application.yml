@@ -10,8 +10,8 @@ spring:
             add-mappings: true
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        username: root
-        password: 123456789
+        username: zhangxb
+        password: Canyou1317..
         url: jdbc:mysql://42.194.251.131:3306/jelly?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC
         hikari:
             minimum-idle: 10
